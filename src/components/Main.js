@@ -2,7 +2,12 @@ import { useState, useEffect } from "react";
 import { api } from "../utils/Api";
 import Card from "./Card";
 
-export default function Main(props) {
+export default function Main({
+  onEditAvatar,
+  onEditProfile,
+  onAddPlace,
+  onCardClick,
+}) {
   const [userName, setUserName] = useState("");
   const [userDescription, setUserDescription] = useState("");
   const [userAvatar, setUserAvatar] = useState("");
@@ -16,10 +21,16 @@ export default function Main(props) {
         setUserDescription(data.about);
         setUserAvatar(data.avatar);
       })
+      .catch((e) => {
+        console.log(e);
+      })
       .then(() => {
         api.getCards().then((cards) => {
           setInitialCards(cards);
         });
+      })
+      .catch((e) => {
+        console.log(e);
       });
   }, []);
 
@@ -31,7 +42,7 @@ export default function Main(props) {
             type="button"
             aria-label="Открыть окно изменения аватара"
             className="profile__change-avatar-button"
-            onClick={props.onEditAvatar}
+            onClick={onEditAvatar}
           ></button>
           <img
             src={userAvatar}
@@ -45,7 +56,7 @@ export default function Main(props) {
             type="button"
             className="profile__edit-button"
             aria-label="Редактировать профиль"
-            onClick={props.onEditProfile}
+            onClick={onEditProfile}
           ></button>
           <p className="profile__job">{userDescription}</p>
         </div>
@@ -53,19 +64,13 @@ export default function Main(props) {
           type="button"
           className="profile__add-button"
           aria-label="Добавить карточку места"
-          onClick={props.onAddPlace}
+          onClick={onAddPlace}
         ></button>
       </section>
       <section className="elements">
-        {cards
-          ? cards.map((card) => (
-              <Card
-                key={card._id}
-                card={card}
-                onCardClick={props.onCardClick}
-              />
-            ))
-          : null}
+        {cards?.map((card) => (
+          <Card key={card._id} card={card} onCardClick={onCardClick} />
+        ))}
       </section>
     </main>
   );
