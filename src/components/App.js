@@ -30,12 +30,13 @@ function App() {
     setEditProfileOpen(false);
     setAddPlacePopupOpen(false);
     setImagePopupOpen(false);
-    setSelectedCard(null);
   }
 
   function handleCardClick(e) {
-    setImagePopupOpen(true);
     setSelectedCard(e);
+    setTimeout(() => {
+      setImagePopupOpen(true);
+    }, 200);
   }
 
   return (

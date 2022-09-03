@@ -14,7 +14,7 @@ export default function ImagePopup({ card, onClose, isOpen }) {
             aria-label="Закрыть изображение"
             onClick={onClose}
           ></button>
-          <p className="popup__image-caption"></p>
+          <p className="popup__image-caption">{card?.name}</p>
         </div>
       </div>
     </>
