@@ -5,6 +5,7 @@ export default function PopupWithForm({
   title,
   buttonText,
   children,
+  onSubmit,
 }) {
   return (
     <div
@@ -24,6 +25,7 @@ export default function PopupWithForm({
           name={name}
           method="post"
           noValidate
+          onSubmit={onSubmit}
         >
           {children}
           <button

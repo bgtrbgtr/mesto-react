@@ -63,7 +63,7 @@ class Api {
     }).then(this._getResponseData);
   }
 
-  likeCard({ cardId, liked }) {
+  likeCard(cardId, liked) {
     if (!liked) {
       return fetch(`${this._baseUrl}/cards/${cardId}/likes`, {
         method: "PUT",
