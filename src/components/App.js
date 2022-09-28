@@ -12,13 +12,14 @@ import EditAvatarPopup from "./EditAvatarPopup";
 import AddPlacePopup from "./AddPlacePopup";
 
 function App() {
-  const [isEditProfilePopupOpen, setEditProfileOpen] = useState(false);
-  const [isAddPlacePopupOpen, setAddPlacePopupOpen] = useState(false);
-  const [isEditAvatarPopupOpen, setEditAvatarPopupOpen] = useState(false);
-  const [isImagePopupOpen, setImagePopupOpen] = useState(false);
+  const [isEditProfilePopupOpen, setIsEditProfileOpen] = useState(false);
+  const [isAddPlacePopupOpen, setIsAddPlacePopupOpen] = useState(false);
+  const [isEditAvatarPopupOpen, setIsEditAvatarPopupOpen] = useState(false);
+  const [isImagePopupOpen, setIsImagePopupOpen] = useState(false);
   const [selectedCard, setSelectedCard] = useState(null);
   const [currentUser, setCurrentUser] = useState({});
   const [cards, setCards] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     api
@@ -43,77 +44,120 @@ function App() {
   }, []);
 
   function handleEditAvatarClick() {
-    setEditAvatarPopupOpen(true);
+    setIsEditAvatarPopupOpen(true);
   }
 
   function handleEditProfileClick() {
-    setEditProfileOpen(true);
+    setIsEditProfileOpen(true);
   }
 
   function handleAddPlaceClick() {
-    setAddPlacePopupOpen(true);
+    setIsAddPlacePopupOpen(true);
   }
 
   function closeAllPopups() {
-    setEditAvatarPopupOpen(false);
-    setEditProfileOpen(false);
-    setAddPlacePopupOpen(false);
-    setImagePopupOpen(false);
+    setIsEditAvatarPopupOpen(false);
+    setIsEditProfileOpen(false);
+    setIsAddPlacePopupOpen(false);
+    setIsImagePopupOpen(false);
   }
 
   function handleCardClick(e) {
     setSelectedCard(e);
     setTimeout(() => {
-      setImagePopupOpen(true);
+      setIsImagePopupOpen(true);
     }, 200);
   }
 
   function handleUpdateUser(newInfo) {
+    setIsLoading(true);
     api
       .changeUserInfo(newInfo)
       .then((data) => {
         setCurrentUser(data);
         closeAllPopups();
       })
-      .catch((e) => console.log(e));
+      .catch((e) => console.log(e))
+      .finally(() => {
+        setIsLoading(false);
+      });
   }
 
   function handleUpdateAvatar(link) {
+    setIsLoading(true);
     api
       .changeAvatar(link)
       .then((data) => {
         setCurrentUser(data);
         closeAllPopups();
       })
-      .catch((e) => console.log(e));
+      .catch((e) => console.log(e))
+      .finally(() => {
+        setIsLoading(false);
+      });
   }
 
   function handleCardLike(card) {
     const isLiked = card.likes.some((i) => i._id === currentUser._id);
-    api.likeCard(card._id, isLiked).then((newCard) => {
-      setCards((state) => {
-        return state.map((c) => (c._id === card._id ? newCard : c));
+    api
+      .likeCard(card._id, isLiked)
+      .then((newCard) => {
+        setCards((state) => {
+          return state.map((c) => (c._id === card._id ? newCard : c));
+        });
+      })
+      .catch((e) => {
+        console.log(e);
       });
-    });
   }
 
   function handleCardDelete(card) {
-    api.deleteCard(card._id).then(() => {
-      setCards((state) => {
-        return state.filter((c) => c._id !== card._id);
+    api
+      .deleteCard(card._id)
+      .then(() => {
+        setCards((state) => {
+          return state.filter((c) => c._id !== card._id);
+        });
+      })
+      .catch((e) => {
+        console.log(e);
       });
-    });
   }
 
   function handleAddPlaceSubmit(card) {
+    setIsLoading(true);
     api
       .addCard(card)
       .then((newCard) => {
         setCards([newCard, ...cards]);
         closeAllPopups();
       })
-      .catch((e) => console.log(e));
+      .catch((e) => console.log(e))
+      .finally(() => {
+        setIsLoading(false);
+      });
   }
+
+  const isOpen =
+    isEditAvatarPopupOpen ||
+    isEditProfilePopupOpen ||
+    isAddPlacePopupOpen ||
+    isImagePopupOpen;
+
+  useEffect(() => {
+    function closeByEscape(evt) {
+      if (evt.key === "Escape") {
+        closeAllPopups();
+      }
+    }
+
+    if (isOpen) {
+      document.addEventListener("keydown", closeByEscape);
+      return () => {
+        document.removeEventListener("keydown", closeByEscape);
+      };
+    }
+  }, [isOpen]);
 
   return (
     <CurrentUserContext.Provider value={currentUser}>
@@ -131,12 +175,14 @@ function App() {
 
         <EditProfilePopup
           isOpen={isEditProfilePopupOpen}
+          isLoading={isLoading}
           onClose={closeAllPopups}
           onUpdateUser={handleUpdateUser}
         />
 
         <AddPlacePopup
           isOpen={isAddPlacePopupOpen}
+          isLoading={isLoading}
           onClose={closeAllPopups}
           onAddCard={handleAddPlaceSubmit}
         />
@@ -153,10 +199,11 @@ function App() {
           name="confirm"
           title="Вы уверены?"
           buttonText="Да"
-        ></PopupWithForm>
+        />
 
         <EditAvatarPopup
           isOpen={isEditAvatarPopupOpen}
+          isLoading={isLoading}
           onClose={closeAllPopups}
           onUpdateAvatar={handleUpdateAvatar}
         />

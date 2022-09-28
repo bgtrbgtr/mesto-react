@@ -22,7 +22,7 @@ export default function Main({
             aria-label="Открыть окно изменения аватара"
             className="profile__change-avatar-button"
             onClick={onEditAvatar}
-          ></button>
+          />
           <img
             src={currentUser.avatar}
             alt="Аватар пользователя"
@@ -36,7 +36,7 @@ export default function Main({
             className="profile__edit-button"
             aria-label="Редактировать профиль"
             onClick={onEditProfile}
-          ></button>
+          />
           <p className="profile__job">{currentUser.about}</p>
         </div>
         <button
@@ -44,7 +44,7 @@ export default function Main({
           className="profile__add-button"
           aria-label="Добавить карточку места"
           onClick={onAddPlace}
-        ></button>
+        />
       </section>
       <section className="elements">
         {cards?.map((card) => (

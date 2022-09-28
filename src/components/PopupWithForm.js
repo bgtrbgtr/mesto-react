@@ -17,14 +17,13 @@ export default function PopupWithForm({
           className="popup__close-button"
           aria-label="Закрыть всплывающее окно"
           onClick={onClose}
-        ></button>
+        />
         <h2 className="popup__heading">{title}</h2>
         <form
           action="#"
           className={`popup__form popup__form_type_${name}`}
           name={name}
           method="post"
-          noValidate
           onSubmit={onSubmit}
         >
           {children}
